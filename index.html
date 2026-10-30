@@ -1,0 +1,1057 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>RB Projects Lab</title>
+
+<link rel="icon" href="logo.png">
+
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/aos@2.3.1/dist/aos.css"/>
+
+<style>
+
+/* =====================================================
+   FLUID / INTRINSIC RESPONSIVE DESIGN
+   No @media queries: layout adapts using clamp(), min(),
+   flex-wrap, and auto-fit grids.
+   ===================================================== */
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+}
+
+html{
+scroll-behavior:smooth;
+-webkit-text-size-adjust:100%;
+}
+
+body{
+font-family:'Poppins',sans-serif;
+background:#020617;
+color:#e2e8f0;
+overflow-x:hidden;
+line-height:1.6;
+}
+
+img,video,canvas{
+max-width:100%;
+}
+
+/* ===== BACKGROUND LAYERS ===== */
+
+.gradient-bg{
+position:fixed;
+inset:0;
+z-index:-4;
+background:linear-gradient(45deg,#020617,#0f172a,#1e3a8a,#0ea5e9);
+background-size:400% 400%;
+animation:gradientMove 20s ease infinite;
+}
+
+@keyframes gradientMove{
+0%{background-position:0% 50%;}
+50%{background-position:100% 50%;}
+100%{background-position:0% 50%;}
+}
+
+#particleCanvas{
+position:fixed;
+inset:0;
+width:100%;
+height:100%;
+z-index:-3;
+pointer-events:none;
+opacity:0.8;
+}
+
+#binaryCanvas{
+position:fixed;
+inset:0;
+width:100%;
+height:100%;
+z-index:-2;
+opacity:0.35;
+}
+
+.tech-icons{
+position:fixed;
+inset:0;
+z-index:-2;
+pointer-events:none;
+overflow:hidden;
+}
+
+.tech-icon{
+position:absolute;
+opacity:0.4;
+filter:drop-shadow(0 0 8px cyan);
+animation:floatIcon linear infinite;
+}
+
+@keyframes floatIcon{
+0%{transform:translateY(110vh) rotate(0deg);opacity:0;}
+20%{opacity:0.4;}
+80%{opacity:0.4;}
+100%{transform:translateY(-10vh) rotate(360deg);opacity:0;}
+}
+
+.circuit-layer{
+position:fixed;
+inset:0;
+pointer-events:none;
+z-index:-1;
+}
+
+/* ===== NAVBAR ===== */
+
+.navbar{
+display:flex;
+justify-content:space-between;
+align-items:center;
+gap:12px;
+padding:clamp(10px,2vw,18px) clamp(14px,6%,60px);
+background:rgba(2,6,23,0.8);
+backdrop-filter:blur(10px);
+position:fixed;
+top:0;
+left:0;
+width:100%;
+z-index:100;
+border-bottom:1px solid rgba(0,255,255,0.2);
+}
+
+.logo{
+display:flex;
+align-items:center;
+gap:10px;
+font-family:'Orbitron',sans-serif;
+font-size:clamp(0.95rem,3.5vw,1.4rem);
+color:#00ffff;
+font-weight:700;
+min-width:0;
+}
+
+.logo img{
+width:clamp(36px,8vw,50px);
+height:clamp(36px,8vw,50px);
+object-fit:contain;
+flex-shrink:0;
+}
+
+.logo span{
+overflow:hidden;
+text-overflow:ellipsis;
+white-space:nowrap;
+}
+
+/* ===== MENU ===== */
+
+.menu-btn{
+width:28px;
+height:22px;
+flex-shrink:0;
+display:flex;
+flex-direction:column;
+justify-content:space-between;
+cursor:pointer;
+z-index:200;
+}
+
+.menu-btn span{
+display:block;
+height:3px;
+width:100%;
+background:#00ffff;
+border-radius:4px;
+transition:0.35s;
+}
+
+.menu-btn.active span:nth-child(1){transform:translateY(9.5px) rotate(45deg);}
+.menu-btn.active span:nth-child(2){opacity:0;}
+.menu-btn.active span:nth-child(3){transform:translateY(-9.5px) rotate(-45deg);}
+
+.nav-links{
+position:fixed;
+top:clamp(60px,10vw,80px);
+right:0;
+width:min(220px,calc(100vw - 40px));
+max-height:calc(100vh - 100px);
+overflow-y:auto;
+background:rgba(2,6,23,0.92);
+backdrop-filter:blur(10px);
+list-style:none;
+padding:25px;
+border-radius:12px;
+display:flex;
+flex-direction:column;
+gap:18px;
+border:1px solid rgba(0,255,255,0.2);
+transform:translateX(110%);
+transition:transform 0.4s, right 0.4s;
+visibility:hidden;
+}
+
+.nav-links.active{
+right:20px;
+transform:translateX(0);
+visibility:visible;
+}
+
+.nav-links a{
+text-decoration:none;
+color:white;
+font-size:16px;
+display:inline-block;
+transition:0.3s;
+}
+
+.nav-links a:hover{
+color:#00ffff;
+transform:translateX(6px);
+}
+
+/* ===== HERO ===== */
+
+.glow-text{
+color:#00ffff;
+text-shadow:0 0 5px #d3ff35,0 0 5px #00ffff,0 0 1px #00ffff,0 0 2px #00ffff;
+}
+
+.hero{
+min-height:100vh;
+min-height:100svh;
+display:flex;
+flex-direction:column;
+align-items:center;
+justify-content:center;
+text-align:center;
+padding:clamp(80px,12vw,100px) 20px 40px;
+max-width:900px;
+margin:auto;
+}
+
+.hero-logo{
+width:clamp(140px,35vw,300px);
+height:auto;
+margin-bottom:20px;
+border-radius:50%;
+}
+
+.hero-title{
+font-family:'Orbitron',sans-serif;
+font-size:clamp(1.8rem,8vw,4.4rem);
+line-height:1.15;
+background:linear-gradient(45deg,#00ffff,#00ff88);
+-webkit-background-clip:text;
+background-clip:text;
+-webkit-text-fill-color:transparent;
+}
+
+.hero p{
+margin:15px 0 25px;
+font-size:clamp(0.95rem,2.5vw,1.25rem);
+}
+
+.hero-btn{
+display:inline-block;
+padding:clamp(11px,2vw,14px) clamp(22px,4vw,30px);
+background:#00ffff;
+color:#000;
+border-radius:30px;
+text-decoration:none;
+font-weight:600;
+font-size:clamp(0.9rem,2vw,1rem);
+transition:0.3s;
+}
+
+.hero-btn:hover{
+transform:translateY(-3px);
+box-shadow:0 0 20px #00ffff;
+}
+
+/* ===== SECTIONS ===== */
+
+.tech-glow{
+color:#dd6d6d;
+text-shadow:0 0 5px #00ffff,0 0 60px #00ffff,0 0 90px #00ffff,0 0 80px #f24141;
+}
+
+.section{
+padding:clamp(70px,12vw,120px) clamp(16px,6%,60px);
+max-width:1200px;
+margin:auto;
+}
+
+.section-title{
+font-size:clamp(1.5rem,5vw,2.6rem);
+margin-bottom:clamp(28px,5vw,50px);
+text-align:center;
+font-family:'Orbitron',sans-serif;
+color:#00ffff;
+letter-spacing:2px;
+overflow-wrap:anywhere;
+}
+
+#about p{
+text-align:justify;
+text-justify:inter-word;
+hyphens:auto;
+max-width:900px;
+margin:auto;
+font-size:clamp(0.95rem,2vw,1.05rem);
+line-height:1.8;
+}
+
+/* ===== PROJECTS ===== */
+
+.project-category{
+margin-bottom:20px;
+display:flex;
+flex-direction:column;
+align-items:center;
+}
+
+.project-main{
+display:flex;
+justify-content:space-between;
+align-items:center;
+gap:12px;
+width:min(100%,560px);
+padding:clamp(12px,2.5vw,16px) clamp(20px,4vw,40px);
+font-family:inherit;
+font-size:clamp(1rem,3vw,1.35rem);
+font-weight:600;
+color:white;
+text-decoration:none;
+border:none;
+background:linear-gradient(135deg,#00f7ff,#0066ff);
+border-radius:50px;
+cursor:pointer;
+transition:0.3s ease;
+}
+
+.project-main:hover{
+transform:scale(1.04);
+box-shadow:0 0 20px #aad4d6;
+}
+
+.arrow{transition:0.3s;}
+.project-main.active .arrow{transform:rotate(180deg);}
+
+.project-list{
+width:min(100%,560px);
+max-height:0;
+overflow:hidden;
+transition:0.4s ease;
+background:rgba(0,0,0,0.25);
+border-radius:10px;
+margin-top:10px;
+}
+
+.pdf-download{
+padding:18px 10px;
+display:flex;
+justify-content:center;
+}
+
+.download-card{
+display:block;
+width:min(100%,420px);
+padding:14px 25px;
+font-size:clamp(0.95rem,2.5vw,1.1rem);
+font-weight:500;
+text-align:center;
+color:white;
+text-decoration:none;
+background:rgba(0,0,0,0.35);
+border-radius:30px;
+border:1px solid rgba(255,255,255,0.15);
+backdrop-filter:blur(6px);
+transition:all 0.3s ease;
+}
+
+.download-card:hover{
+transform:scale(1.05);
+background:linear-gradient(90deg,#00f2ff,#0072ff);
+box-shadow:0 0 20px rgba(0,255,255,0.7);
+}
+
+/* ===== GALLERY ===== */
+
+.gallery-grid{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(min(100%,180px),1fr));
+gap:clamp(12px,3vw,25px);
+max-width:1000px;
+margin:auto;
+}
+
+.gallery-grid img{
+width:100%;
+aspect-ratio:1/1;
+height:auto;
+object-fit:contain;
+background:#0b1a2a;
+border-radius:10px;
+padding:5px;
+transition:0.4s;
+}
+
+.gallery-grid img:hover{
+transform:scale(1.06);
+box-shadow:0 10px 30px rgba(0,255,255,0.4);
+}
+
+.gallery-more{
+margin-top:clamp(30px,5vw,50px);
+}
+
+/* ===== VIDEO ===== */
+
+.video-box{
+width:100%;
+display:flex;
+align-items:center;
+justify-content:center;
+}
+
+.video-box video{
+display:block;
+width:min(100%,420px);
+height:auto;
+max-height:75vh;
+object-fit:contain;
+border-radius:12px;
+}
+
+/* ===== TESTIMONIALS ===== */
+
+.testimonial-container{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));
+gap:clamp(18px,3vw,40px);
+max-width:1200px;
+margin:auto;
+}
+
+.testimonial-card{
+width:100%;
+background:rgba(255,255,255,0.08);
+backdrop-filter:blur(10px);
+border:1px solid rgba(0,255,255,0.2);
+padding:clamp(20px,3vw,30px);
+border-radius:15px;
+transition:.3s;
+}
+
+.testimonial-card:hover{
+transform:translateY(-10px);
+box-shadow:0 0 20px rgba(0,255,255,0.3);
+}
+
+.quote-mark{
+font-size:60px;
+line-height:1;
+color:#00ffff;
+margin-bottom:10px;
+}
+
+.student-name{color:#00ffff;}
+.stars{color:#facc15;}
+
+/* ===== FAQ ===== */
+
+.faq-item{margin:0 auto 15px;max-width:900px;}
+
+.faq-question{
+width:100%;
+background:#1e293b;
+border:none;
+border-radius:8px;
+color:white;
+font-family:inherit;
+font-size:clamp(0.95rem,2.2vw,1.05rem);
+padding:15px;
+text-align:left;
+cursor:pointer;
+}
+
+.faq-answer{
+display:none;
+background:#0f172a;
+padding:15px;
+border-radius:0 0 8px 8px;
+}
+
+.faq-item.active .faq-answer{display:block;}
+
+/* ===== CONTACT ===== */
+
+.contact{
+text-align:center;
+font-size:clamp(0.95rem,2.2vw,1.1rem);
+overflow-wrap:anywhere;
+}
+
+/* ===== FLOATING BUTTONS ===== */
+
+.whatsapp-float{
+position:fixed;
+bottom:20px;
+right:20px;
+width:clamp(46px,10vw,60px);
+height:clamp(46px,10vw,60px);
+z-index:1000;
+}
+
+.whatsapp-float img{
+width:100%;
+height:100%;
+border-radius:50%;
+box-shadow:0 0 20px #25D366;
+transition:0.3s;
+}
+
+.whatsapp-float img:hover{
+transform:scale(1.12);
+box-shadow:0 0 15px #25D366,0 0 35px #25D366,0 0 60px #25D366;
+}
+
+#scrollTopBtn{
+position:fixed;
+bottom:calc(clamp(46px,10vw,60px) + 35px);
+right:20px;
+width:clamp(42px,9vw,52px);
+height:clamp(42px,9vw,52px);
+background:linear-gradient(45deg,#00ffff,#00ff88);
+border:none;
+border-radius:50%;
+font-size:clamp(16px,3vw,20px);
+cursor:pointer;
+display:none;
+box-shadow:0 0 15px rgba(0,255,255,0.6);
+transition:0.3s;
+z-index:999;
+}
+
+#scrollTopBtn:hover{transform:scale(1.2);}
+
+/* ===== FOOTER ===== */
+
+.footer{
+position:relative;
+background:rgba(0,0,0,0.7);
+backdrop-filter:blur(12px);
+padding:clamp(40px,6vw,60px) clamp(16px,6%,60px) 20px;
+margin-top:clamp(40px,8vw,80px);
+border-top:1px solid rgba(0,255,255,0.2);
+overflow:hidden;
+}
+
+.footer-container{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr));
+gap:clamp(24px,4vw,40px);
+max-width:1200px;
+margin:auto;
+position:relative;
+z-index:2;
+}
+
+.footer h3{font-family:'Orbitron',sans-serif;color:#00ffff;margin-bottom:10px;}
+.footer h4{margin-bottom:12px;color:#00ffff;}
+.footer p{font-size:14px;opacity:0.9;overflow-wrap:anywhere;}
+
+.footer a{
+display:block;
+text-decoration:none;
+color:white;
+margin:6px 0;
+font-size:14px;
+transition:0.3s;
+}
+
+.footer a:hover{color:#00ffff;transform:translateX(6px);}
+
+.footer-circuit{
+position:absolute;
+inset:0;
+background-image:
+linear-gradient(rgba(0,255,255,0.15) 1px,transparent 1px),
+linear-gradient(90deg,rgba(0,255,255,0.15) 1px,transparent 1px);
+background-size:40px 40px;
+animation:circuitMoveFooter 20s linear infinite;
+opacity:0.25;
+}
+
+@keyframes circuitMoveFooter{
+0%{background-position:0 0;}
+100%{background-position:200px 200px;}
+}
+
+.footer-bottom{
+text-align:center;
+margin-top:30px;
+font-size:14px;
+opacity:0.7;
+position:relative;
+z-index:2;
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- ===== BACKGROUND SYSTEM ===== -->
+<div class="gradient-bg"></div>
+<canvas id="particleCanvas"></canvas>
+<div class="tech-icons"></div>
+<canvas id="binaryCanvas"></canvas>
+<div class="circuit-layer" id="circuitLayer"></div>
+
+<header class="navbar">
+
+<div class="logo">
+<img src="logo.png" alt="RB Projects Lab Logo">
+<span>RB PROJECT LAB</span>
+</div>
+
+<div class="menu-btn" aria-label="Menu" role="button" tabindex="0">
+<span></span>
+<span></span>
+<span></span>
+</div>
+
+<ul class="nav-links">
+<li><a href="#about">About</a></li>
+<li><a href="#projects">Projects</a></li>
+<li><a href="#gallery">Gallery</a></li>
+<li><a href="#demo">Demo</a></li>
+<li><a href="#testimonials">Testimonials</a></li>
+<li><a href="#faq">FAQ</a></li>
+<li><a href="#contact">Contact</a></li>
+</ul>
+
+</header>
+
+<section class="hero">
+
+<img src="logo.png" alt="RB Projects Lab" class="hero-logo" data-aos="zoom-in">
+
+<h1 class="hero-title glow-text" data-aos="fade-down">RB PROJECT LAB</h1>
+
+<p data-aos="fade-up">Electronics • Robotics • Science Projects</p>
+
+<a href="#projects" class="hero-btn" data-aos="zoom-in">Explore Projects</a>
+
+</section>
+
+<section id="about" class="section">
+
+<h2 class="section-title tech-glow" data-aos="fade-right">About</h2>
+
+<p data-aos="fade-up">
+<strong>Where curiosity meets technology, and ideas transform into real-world innovations.</strong>
+Initiated by an experienced technologist and passionate educator, this helps Engineering and Science related students transform ideas into practical innovations. With a strong academic background from renowned institutions and years of hands-on experience in electronics and embedded systems, we bring both deep technical expertise and a genuine passion for mentoring young innovators.
+
+Through our work and our YouTube channel, we guide students step-by-step in building innovative academic and practical projects across a wide range of technologies, including: <strong>
+Electronics system design, Arduino and non-Arduino based projects, Embedded systems, Innovative science and engineering prototypes.</strong> Our mission is simple yet powerful: to make advanced technical projects accessible, understandable, and achievable for students.<strong> Join us turning curiosity into circuits, ideas into innovation, and learning into real-world creations !</strong>
+</p>
+
+</section>
+
+<section id="projects" class="section">
+
+<h2 class="section-title tech-glow" data-aos="fade-right">Projects</h2>
+
+<div class="project-category">
+
+<button class="project-main" data-aos="zoom-in">
+<span>⚙ Arduino Projects</span>
+<span class="arrow">▼</span>
+</button>
+
+<div class="project-list">
+<div class="pdf-download">
+<a href="arduino.pdf" class="download-card">📄 Download Arduino Projects</a>
+</div>
+</div>
+
+</div>
+
+<div class="project-category">
+
+<button class="project-main" data-aos="zoom-in">
+<span>🔌 Non-Arduino Projects</span>
+<span class="arrow">▼</span>
+</button>
+
+<div class="project-list">
+<div class="pdf-download">
+<a href="w_arduino.pdf" class="download-card">📄 Download Non-Arduino Projects</a>
+</div>
+</div>
+
+</div>
+
+</section>
+
+<section id="gallery" class="section">
+
+<h2 class="section-title tech-glow" data-aos="fade-left">PROJECT GALLERY</h2>
+
+<div class="gallery-grid">
+<img src="pn1.jpeg" alt="Project 1" data-aos="zoom-in">
+<img src="pn2.jpeg" alt="Project 2" data-aos="zoom-in">
+<img src="pn3.jpeg" alt="Project 3" data-aos="zoom-in">
+<img src="pn5.jpeg" alt="Project 4" data-aos="zoom-in">
+</div>
+
+<div class="project-category gallery-more">
+<a href="gallery.html" class="project-main" data-aos="zoom-in">
+<span>🔍 Explore more</span>
+</a>
+</div>
+
+</section>
+
+<section id="demo" class="section">
+
+<h2 class="section-title tech-glow" data-aos="fade-left" data-aos-duration="1200">Sample Project Demonstration</h2>
+
+<div class="video-box" data-aos="zoom-in-up" data-aos-delay="150">
+<video controls playsinline>
+<source src="vid.mp4" type="video/mp4">
+Your browser does not support the video tag.
+</video>
+</div>
+
+</section>
+
+<section id="testimonials" class="section testimonials-section">
+
+<h2 class="section-title tech-glow" data-aos="fade-left" data-aos-duration="1200">Testimonials</h2>
+
+<div class="testimonial-container">
+
+<div class="testimonial-card" data-aos="fade-up" data-aos-delay="100">
+<div class="quote-mark">“</div>
+<p class="testimonial-text">
+One of the best resources for engineering and science project ideas. The explanations are clear, practical, and easy to follow. I was able to complete my Arduino project confidently with the help of these tutorials.
+</p>
+<div class="student-info">
+<div>
+<h4 class="student-name">Rahul Jaikar</h4>
+<span class="student-class">Engineering Student</span>
+<div class="stars">★★★★★</div>
+</div>
+</div>
+</div>
+
+<div class="testimonial-card" data-aos="fade-up" data-aos-delay="200">
+<div class="quote-mark">“</div>
+<p class="testimonial-text">
+The projects are not just for academic submissions — they actually help you understand how real electronics systems work. Highly recommended for students who want hands-on learning.
+</p>
+<div class="student-info">
+<div>
+<h4 class="student-name">Arjun Singh</h4>
+<span class="student-class">Final Year Engineering student</span>
+<div class="stars">★★★★</div>
+</div>
+</div>
+</div>
+
+<div class="testimonial-card" data-aos="fade-up" data-aos-delay="300">
+<div class="quote-mark">“</div>
+<p class="testimonial-text">
+A fantastic platform for science students preparing for exhibitions and practical projects. The innovative ideas and clear demonstrations make learning exciting.
+</p>
+<div class="student-info">
+<div>
+<h4 class="student-name">Sayan Chatterjee</h4>
+<span class="student-class">Science Stream Student</span>
+<div class="stars">★★★★★</div>
+</div>
+</div>
+</div>
+
+</div>
+</section>
+
+<section id="faq" class="section">
+<h2 class="section-title tech-glow" data-aos="fade-right" data-aos-duration="1200">FAQs</h2>
+
+<div class="faq-item" data-aos="fade-up" data-aos-delay="100">
+<button class="faq-question">Who are these projects designed for?</button>
+<div class="faq-answer">These projects are designed primarily for science and engineering students who need innovative and practical project ideas for school assignments, college submissions, exhibitions, and final-year projects.</div>
+</div>
+
+<div class="faq-item" data-aos="fade-up" data-aos-delay="100">
+<button class="faq-question">Are the projects suitable for beginners?</button>
+<div class="faq-answer">Yes. Many projects are explained in a step-by-step manner, making them suitable for beginners as well as intermediate learners who want to build practical skills in electronics, embedded systems and IoT.</div>
+</div>
+
+<div class="faq-item" data-aos="fade-up" data-aos-delay="100">
+<button class="faq-question">What technologies will I learn through these projects?</button>
+<div class="faq-answer">Students can learn and gain hands-on experience with electronics design, Arduino programming, embedded systems, microcontrollers, sensors, IoT and real-world automation concepts.</div>
+</div>
+
+<div class="faq-item" data-aos="fade-up" data-aos-delay="100">
+<button class="faq-question">Do you provide innovative project ideas for science exhibitions or competitions?</button>
+<div class="faq-answer">Absolutely. Many of the projects are created to help students present unique and innovative ideas for science fairs, exhibitions, and technical competitions.</div>
+</div>
+</section>
+
+<!-- WhatsApp Floating Button -->
+<a href="https://wa.me/919433531791?text=Good%20morning%2C%20Sir.%20I%20hope%20you%20are%20doing%20well.%20I%20would%20like%20to%20discuss%20about%20a%20project"
+   class="whatsapp-float"
+   target="_blank" rel="noopener">
+<img src="wp_icon.png" alt="WhatsApp">
+</a>
+
+<section id="contact" class="section">
+
+<h2 class="section-title tech-glow" data-aos="fade-left">Contact</h2>
+
+<div class="contact" data-aos="fade-up">
+
+Phone: +91 9433531791 <br>
+Email: digimechservice@gmail.com
+
+<div style="text-align:center; margin-top:30px;">
+<h3>Explore More Projects on Our YouTube Channel</h3>
+<p>Watch detailed tutorials and innovative electronics projects.</p>
+
+<a href="https://youtube.com/@rbprojectlab?si=JFz3p_SPQdHSkbke" target="_blank" rel="noopener">
+<img src="https://cdn-icons-png.flaticon.com/512/1384/1384060.png" alt="YouTube Channel" width="60">
+</a>
+</div>
+
+</div>
+
+</section>
+
+<footer class="footer">
+
+<div class="footer-circuit"></div>
+
+<div class="footer-container">
+
+<div class="footer-logo">
+<h3>RB Projects Lab</h3>
+<p>Electronics • Robotics • Science Projects</p>
+</div>
+
+<div class="footer-links">
+<h4>Quick Links</h4>
+<a href="#about">About</a>
+<a href="#projects">Projects</a>
+<a href="#gallery">Gallery</a>
+<a href="#demo">Demo</a>
+<a href="#contact">Contact</a>
+</div>
+
+<div class="footer-contact">
+<h4>Contact</h4>
+<p>📞 Phone: +91 9433531791</p>
+<p>✉ Email: digimechservice@gmail.com</p>
+<p>📍 India</p>
+</div>
+
+<div class="footer-social">
+<h4>Follow</h4>
+<a href="#" class="social-icon">Website</a>
+<a href="https://youtube.com/@rbprojectlab?si=JFz3p_SPQdHSkbke" target="_blank" rel="noopener" class="social-icon">Youtube</a>
+<a href="#" class="social-icon">Instagram</a>
+</div>
+
+</div>
+
+<div class="footer-bottom">
+© 2026 RB Projects Lab • All Rights Reserved
+</div>
+
+</footer>
+
+<button id="scrollTopBtn" aria-label="Scroll to top">🚀</button>
+
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+
+<script>
+
+AOS.init({duration:1000, once:true});
+
+/* ===== MENU ===== */
+
+const menuBtn=document.querySelector(".menu-btn")
+const navLinks=document.querySelector(".nav-links")
+
+menuBtn.onclick=()=>{
+menuBtn.classList.toggle("active")
+navLinks.classList.toggle("active")
+}
+
+/* close menu after choosing a link */
+navLinks.querySelectorAll("a").forEach(a=>{
+a.addEventListener("click",()=>{
+menuBtn.classList.remove("active")
+navLinks.classList.remove("active")
+})
+})
+
+/* ===== FAQ ===== */
+
+document.querySelectorAll(".faq-question").forEach(btn=>{
+btn.onclick=()=>btn.parentElement.classList.toggle("active")
+})
+
+/* ===== PROJECT DROPDOWN (buttons only) ===== */
+
+document.querySelectorAll("button.project-main").forEach(button=>{
+button.addEventListener("click",()=>{
+button.classList.toggle("active")
+const list=button.nextElementSibling
+list.style.maxHeight = list.style.maxHeight ? null : list.scrollHeight+"px"
+})
+})
+
+/* ===== BINARY MATRIX (resizes with window) ===== */
+
+const canvas=document.getElementById("binaryCanvas")
+const ctx=canvas.getContext("2d")
+const letters="01"
+const fontSize=12
+let drops=[]
+
+function sizeBinary(){
+canvas.width=window.innerWidth
+canvas.height=window.innerHeight
+const columns=Math.ceil(canvas.width/fontSize)
+while(drops.length<columns) drops.push(1)
+drops.length=columns
+}
+sizeBinary()
+
+function drawBinary(){
+ctx.fillStyle="rgba(2,6,23,0.08)"
+ctx.fillRect(0,0,canvas.width,canvas.height)
+ctx.fillStyle="#00ffff"
+ctx.font=fontSize+"px monospace"
+for(let i=0;i<drops.length;i++){
+const text=letters[Math.floor(Math.random()*letters.length)]
+ctx.fillText(text,i*fontSize,drops[i]*fontSize)
+if(drops[i]*fontSize>canvas.height && Math.random()>0.975){drops[i]=0}
+drops[i]++
+}
+}
+setInterval(drawBinary,75)
+
+/* ===== PARTICLE FIELD (resizes with window) ===== */
+
+const particleCanvas=document.getElementById("particleCanvas")
+const pctx=particleCanvas.getContext("2d")
+
+function sizeParticles(){
+particleCanvas.width=window.innerWidth
+particleCanvas.height=window.innerHeight
+}
+sizeParticles()
+
+/* fewer particles on small screens, more on large ones */
+const particleCount=()=>Math.round(Math.min(80,Math.max(25,window.innerWidth/18)))
+
+let particles=[]
+function initParticles(){
+particles=[]
+for(let i=0;i<particleCount();i++){
+particles.push({
+x:Math.random()*particleCanvas.width,
+y:Math.random()*particleCanvas.height,
+vx:(Math.random()-0.5)*0.5,
+vy:(Math.random()-0.5)*0.5
+})
+}
+}
+initParticles()
+
+function drawParticles(){
+pctx.clearRect(0,0,particleCanvas.width,particleCanvas.height)
+
+particles.forEach(p=>{
+p.x+=p.vx
+p.y+=p.vy
+if(p.x<0||p.x>particleCanvas.width)p.vx*=-1
+if(p.y<0||p.y>particleCanvas.height)p.vy*=-1
+pctx.beginPath()
+pctx.arc(p.x,p.y,2,0,Math.PI*2)
+pctx.fillStyle="#00ffff"
+pctx.fill()
+})
+
+for(let i=0;i<particles.length;i++){
+for(let j=i+1;j<particles.length;j++){
+const dx=particles[i].x-particles[j].x
+const dy=particles[i].y-particles[j].y
+if(Math.sqrt(dx*dx+dy*dy)<120){
+pctx.strokeStyle="rgba(0,255,255,0.2)"
+pctx.lineWidth=1
+pctx.beginPath()
+pctx.moveTo(particles[i].x,particles[i].y)
+pctx.lineTo(particles[j].x,particles[j].y)
+pctx.stroke()
+}
+}
+}
+requestAnimationFrame(drawParticles)
+}
+drawParticles()
+
+/* keep canvases correct on resize / rotation */
+let resizeTimer
+window.addEventListener("resize",()=>{
+clearTimeout(resizeTimer)
+resizeTimer=setTimeout(()=>{
+sizeBinary()
+sizeParticles()
+initParticles()
+},150)
+})
+
+/* ===== FLOATING TECH ICONS ===== */
+
+const iconContainer=document.querySelector(".tech-icons")
+const icons=["💻","🔌","⚙️","🧠","📡","🔋","🧲","📟","🖥️"]
+
+for(let i=0;i<25;i++){
+const icon=document.createElement("div")
+icon.className="tech-icon"
+icon.innerText=icons[Math.floor(Math.random()*icons.length)]
+icon.style.left=Math.random()*95+"%"
+icon.style.animationDuration=(15+Math.random()*15)+"s"
+icon.style.fontSize=(18+Math.random()*18)+"px"
+iconContainer.appendChild(icon)
+}
+
+/* ===== SCROLL TO TOP ===== */
+
+const scrollBtn=document.getElementById("scrollTopBtn")
+
+window.addEventListener("scroll",()=>{
+const y=document.body.scrollTop||document.documentElement.scrollTop
+scrollBtn.style.display = y>300 ? "block" : "none"
+})
+
+scrollBtn.onclick=()=>window.scrollTo({top:0,behavior:"smooth"})
+
+</script>
+
+</body>
+</html>
