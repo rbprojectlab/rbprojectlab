@@ -1,1079 +1,596 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>3D Project Gallery</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>3D Project Gallery</title>
+<link rel="preload" as="image" href="pn1.jpeg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
 
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+:root{
+--bg:#050508;--surface:#0a0a10;
+--text:#f4f4f8;--text-muted:#9a9aab;
+--accent:#a78bfa;--accent-cyan:#67e8f9;--accent-magenta:#e879f9;
+--accent-soft:rgba(167,139,250,0.35);
+}
 
-    :root {
-      --bg: #050508;
-      --surface: #0a0a10;
-      --border: rgba(255, 255, 255, 0.08);
-      --text: #f4f4f8;
-      --text-muted: #9a9aab;
-      --accent: #a78bfa;
-      --accent-cyan: #67e8f9;
-      --accent-magenta: #e879f9;
-      --accent-soft: rgba(167, 139, 250, 0.35);
-      --glow: rgba(167, 139, 250, 0.55);
-    }
+html{height:100%;}
 
-    body {
-      font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      height: 100vh;
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      padding: 1.25rem;
-      position: relative;
-    }
+body{
+font-family:'Inter',system-ui,-apple-system,sans-serif;
+background:var(--bg);
+color:var(--text);
+height:100vh;
+height:100dvh;               /* real visible height on phones */
+overflow:hidden;
+display:flex;
+flex-direction:column;
+justify-content:center;
+padding:1.25rem;
+padding-bottom:max(1.25rem,env(safe-area-inset-bottom));
+position:relative;
+}
 
-    /* Multi-layer background system */
-    .bg-layer {
-      position: fixed;
-      inset: 0;
-      z-index: 0;
-      pointer-events: none;
-    }
+/* ===== BACKGROUND ===== */
+.bg-layer,.orbs-layer,.vignette,.scanlines,.noise,#geometryContainer{
+position:fixed;inset:0;z-index:0;pointer-events:none;
+}
+#geometryContainer{perspective:1200px;}
+.orbs-layer{overflow:hidden;}
 
-    /* Enhanced animated ambient lighting */
-    #ambientLight {
-      position: fixed;
-      top: -30%;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 180%;
-      height: 80%;
-      z-index: 0;
-      pointer-events: none;
-      opacity: 0.8;
-      animation: ambientShift 15s ease-in-out infinite;
-    }
+#ambientLight{
+position:fixed;top:-30%;left:50%;transform:translateX(-50%);
+width:180%;height:80%;z-index:0;pointer-events:none;opacity:.8;
+filter:blur(80px);
+animation:ambientShift 15s ease-in-out infinite;
+}
+@keyframes ambientShift{
+0%,100%{transform:translateX(-50%) translateY(0);opacity:.8;}
+50%{transform:translateX(-48%) translateY(-15px);opacity:.95;}
+}
 
-    @keyframes ambientShift {
-      0%, 100% { 
-        filter: blur(80px);
-        transform: translateX(-50%) translateY(0px);
-        opacity: 0.8;
-      }
-      50% { 
-        filter: blur(100px);
-        transform: translateX(-48%) translateY(-15px);
-        opacity: 0.95;
-      }
-    }
+#particleCanvas{position:fixed;top:0;left:0;z-index:1;pointer-events:none;}
 
-    /* Advanced particle canvas */
-    #particleCanvas {
-      position: fixed;
-      top: 0;
-      left: 0;
-      z-index: 1;
-      pointer-events: none;
-    }
+.geometric-shape{position:absolute;filter:drop-shadow(0 0 20px rgba(167,139,250,.3));}
 
-    /* 3D geometric shapes container */
-    #geometryContainer {
-      position: fixed;
-      inset: 0;
-      z-index: 0;
-      pointer-events: none;
-      perspective: 1200px;
-    }
+.orb{position:absolute;border-radius:50%;filter:blur(70px);opacity:.2;animation:floatOrb 20s ease-in-out infinite;}
+.orb:nth-child(1){width:400px;height:400px;background:rgba(167,139,250,.8);top:5%;left:10%;animation-duration:25s;}
+.orb:nth-child(2){width:350px;height:350px;background:rgba(34,211,238,.6);top:50%;right:5%;animation-duration:22s;animation-delay:-7s;}
+.orb:nth-child(3){width:320px;height:320px;background:rgba(232,121,249,.5);bottom:10%;left:20%;animation-duration:28s;animation-delay:-12s;}
+.orb:nth-child(4){width:380px;height:380px;background:rgba(129,140,248,.4);top:20%;right:15%;animation-duration:26s;animation-delay:-5s;}
+@keyframes floatOrb{
+0%,100%{transform:translate(0,0) scale(1);}
+25%{transform:translate(50px,-40px) scale(1.1);}
+50%{transform:translate(-30px,30px) scale(.95);}
+75%{transform:translate(40px,20px) scale(1.05);}
+}
 
-    .geometric-shape {
-      position: absolute;
-      filter: drop-shadow(0 0 20px rgba(167, 139, 250, 0.3));
-    }
+.vignette{
+background:
+radial-gradient(ellipse 85% 75% at 50% 40%,transparent 15%,rgba(5,5,8,.4) 100%),
+radial-gradient(ellipse 100% 50% at 50% 100%,rgba(5,5,8,.9) 0%,transparent 70%);
+}
+.scanlines{
+background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(255,255,255,.01) 2px,rgba(255,255,255,.01) 4px);
+opacity:.3;
+}
+.noise{
+background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
+opacity:.4;
+}
 
-    /* Enhanced floating orbs with more depth */
-    .orbs-layer {
-      position: fixed;
-      inset: 0;
-      z-index: 0;
-      pointer-events: none;
-      overflow: hidden;
-    }
+/* ===== HEADER ===== */
+header,.gallery-container{position:relative;z-index:2;}
 
-    .orb {
-      position: absolute;
-      border-radius: 50%;
-      filter: blur(70px);
-      opacity: 0.2;
-      animation: floatOrb 20s ease-in-out infinite;
-      box-shadow: 0 0 80px currentColor;
-    }
+header{
+text-align:center;
+margin-bottom:1.25rem;
+opacity:0;transform:translateY(24px);
+animation:enterUp .9s cubic-bezier(.22,1,.36,1) .2s forwards;
+}
 
-    .orb:nth-child(1) {
-      width: 400px; height: 400px;
-      background: rgba(167, 139, 250, 0.8);
-      top: 5%; left: 10%;
-      animation-duration: 25s;
-      animation-delay: 0s;
-    }
+h1{
+font-size:clamp(1.8rem,5vw,3rem);
+font-weight:700;
+letter-spacing:-1.2px;
+margin-bottom:.5rem;
+background:linear-gradient(135deg,#fff 0%,#e0e0f0 40%,#c4b5fd 70%,#a5f3fc 100%);
+-webkit-background-clip:text;background-clip:text;
+-webkit-text-fill-color:transparent;
+filter:drop-shadow(0 0 32px rgba(167,139,250,.35));
+}
 
-    .orb:nth-child(2) {
-      width: 350px; height: 350px;
-      background: rgba(34, 211, 238, 0.6);
-      top: 50%; right: 5%;
-      animation-duration: 22s;
-      animation-delay: -7s;
-    }
+.subtitle{color:var(--text-muted);font-size:clamp(.95rem,2.5vw,1.08rem);max-width:540px;margin:0 auto;opacity:.9;}
 
-    .orb:nth-child(3) {
-      width: 320px; height: 320px;
-      background: rgba(232, 121, 249, 0.5);
-      bottom: 10%; left: 20%;
-      animation-duration: 28s;
-      animation-delay: -12s;
-    }
+.gallery-container{
+max-width:1120px;width:100%;margin:0 auto;
+flex:1;display:flex;flex-direction:column;justify-content:center;min-height:0;
+opacity:0;transform:translateY(32px);
+animation:enterUp .95s cubic-bezier(.22,1,.36,1) .4s forwards;
+}
 
-    .orb:nth-child(4) {
-      width: 380px; height: 380px;
-      background: rgba(129, 140, 248, 0.4);
-      top: 20%; right: 15%;
-      animation-duration: 26s;
-      animation-delay: -5s;
-    }
+@keyframes enterUp{to{opacity:1;transform:translateY(0);}}
 
-    @keyframes floatOrb {
-      0%, 100% { transform: translate(0, 0) scale(1) rotate(0deg); }
-      25% { transform: translate(50px, -40px) scale(1.1) rotate(90deg); }
-      50% { transform: translate(-30px, 30px) scale(0.95) rotate(180deg); }
-      75% { transform: translate(40px, 20px) scale(1.05) rotate(270deg); }
-    }
+/* ===== IMAGE STAGE ===== */
+.main-image-wrapper{
+position:relative;
+width:100%;
+height:clamp(200px,calc(100vh - 310px),600px);
+height:clamp(200px,calc(100dvh - 310px),600px);
+border-radius:24px;
+overflow:hidden;
+background:var(--surface);
+box-shadow:0 0 0 1px rgba(255,255,255,.1),0 8px 40px rgba(0,0,0,.6),0 0 100px rgba(167,139,250,.2);
+isolation:isolate;
+touch-action:pan-y;           /* lets us detect horizontal swipes */
+}
 
-    /* Vignette effect */
-    .vignette {
-      position: fixed;
-      inset: 0;
-      z-index: 0;
-      pointer-events: none;
-      background:
-        radial-gradient(ellipse 85% 75% at 50% 40%, transparent 15%, rgba(5, 5, 8, 0.4) 100%),
-        radial-gradient(ellipse 100% 50% at 50% 100%, rgba(5, 5, 8, 0.9) 0%, transparent 70%);
-    }
+.main-image-wrapper::before{
+content:'';position:absolute;inset:0;border-radius:inherit;padding:2px;
+background:linear-gradient(145deg,rgba(255,255,255,.4) 0%,rgba(255,255,255,.1) 20%,transparent 40%,transparent 60%,rgba(167,139,250,.5) 80%,rgba(34,211,238,.3) 100%);
+-webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);
+mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);
+-webkit-mask-composite:xor;mask-composite:exclude;
+pointer-events:none;z-index:3;
+}
 
-    /* Enhanced scanlines */
-    .scanlines {
-      position: fixed;
-      inset: 0;
-      z-index: 0;
-      pointer-events: none;
-      background: repeating-linear-gradient(
-        0deg,
-        transparent,
-        transparent 2px,
-        rgba(255, 255, 255, 0.01) 2px,
-        rgba(255, 255, 255, 0.01) 4px
-      );
-      opacity: 0.3;
-      animation: scanlineGlow 8s ease-in-out infinite;
-    }
+.main-image{
+position:absolute;inset:0;width:100%;height:100%;
+object-fit:contain;object-position:center;
+opacity:0;transform:scale(1.04);
+transition:opacity .45s ease,transform .6s cubic-bezier(.22,1,.36,1);
+background:#08080e;
+}
+.main-image.active{opacity:1;transform:scale(1);}
 
-    @keyframes scanlineGlow {
-      0%, 100% { opacity: 0.2; }
-      50% { opacity: 0.4; }
-    }
+.loading-overlay{
+position:absolute;inset:0;
+background:rgba(6,6,10,.85);
+display:flex;flex-direction:column;align-items:center;justify-content:center;
+gap:1rem;padding:1rem;text-align:center;
+color:var(--text-muted);font-size:.95rem;font-weight:500;
+pointer-events:none;
+transition:opacity .35s ease;
+opacity:1;z-index:2;
+}
+.loading-overlay.hidden{opacity:0;pointer-events:none;}
+.loading-overlay.error{cursor:pointer;pointer-events:auto;color:#fca5a5;}
+.loading-overlay.error .spinner{display:none;}
 
-    /* Noise overlay */
-    .noise {
-      position: fixed;
-      inset: 0;
-      z-index: 0;
-      pointer-events: none;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
-      opacity: 0.5;
-      animation: noisePulse 3s ease-in-out infinite;
-    }
+.spinner{
+width:40px;height:40px;
+border:3px solid rgba(255,255,255,.08);
+border-top-color:var(--accent);
+border-right-color:var(--accent-cyan);
+border-bottom-color:var(--accent-magenta);
+border-radius:50%;
+animation:spin .8s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg);}}
 
-    @keyframes noisePulse {
-      0%, 100% { opacity: 0.3; }
-      50% { opacity: 0.6; }
-    }
+/* ===== CONTROLS ===== */
+.controls{
+display:flex;justify-content:center;align-items:center;
+gap:1.25rem;margin:1.25rem 0 .6rem;flex-wrap:wrap;
+opacity:0;transform:translateY(16px);
+animation:enterUp .8s cubic-bezier(.22,1,.36,1) .6s forwards;
+}
 
-    header,
-    .gallery-container {
-      position: relative;
-      z-index: 2;
-    }
+.btn{
+min-height:48px;
+min-width:130px;
+padding:.8rem 1.8rem;
+font-size:.98rem;font-weight:600;font-family:inherit;
+border:1px solid rgba(255,255,255,.2);
+background:linear-gradient(180deg,rgba(255,255,255,.12) 0%,rgba(255,255,255,.04) 100%);
+color:var(--text);
+border-radius:999px;
+cursor:pointer;
+transition:transform .25s ease,box-shadow .25s ease,border-color .25s ease;
+-webkit-tap-highlight-color:transparent;
+box-shadow:0 4px 15px rgba(0,0,0,.4),0 0 30px rgba(167,139,250,.1);
+}
+.btn:hover:not(:disabled){
+border-color:rgba(167,139,250,.6);
+transform:translateY(-3px);
+box-shadow:0 12px 40px rgba(0,0,0,.5),0 0 40px rgba(167,139,250,.3);
+}
+.btn:active:not(:disabled){transform:scale(.97);}
+.btn:disabled{opacity:.25;cursor:not-allowed;box-shadow:none;}
 
-    header {
-      text-align: center;
-      margin-bottom: 1.25rem;
-      opacity: 0;
-      transform: translateY(24px);
-      animation: enterUp 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.2s forwards;
-    }
+.counter{
+text-align:center;color:var(--text-muted);
+font-size:.98rem;font-weight:600;letter-spacing:1.6px;
+font-variant-numeric:tabular-nums;
+opacity:0;animation:enterUp .7s ease .75s forwards;
+}
+.counter span{color:var(--text);font-weight:700;}
 
-    h1 {
-      font-size: clamp(2rem, 5vw, 3rem);
-      font-weight: 700;
-      letter-spacing: -1.2px;
-      margin-bottom: 0.6rem;
-      background: linear-gradient(135deg, #ffffff 0%, #e0e0f0 40%, #c4b5fd 70%, #a5f3fc 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      filter: drop-shadow(0 0 32px rgba(167, 139, 250, 0.35));
-      animation: titleGlow 3s ease-in-out infinite;
-    }
+.hint{
+text-align:center;margin-top:.8rem;font-size:.78rem;
+color:rgba(154,154,171,.5);letter-spacing:.6px;
+opacity:0;animation:enterUp .7s ease .9s forwards;
+}
+.hint kbd{
+display:inline-block;padding:.14rem .45rem;margin:0 .18rem;font-size:.72rem;font-family:inherit;
+background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:6px;
+}
 
-    @keyframes titleGlow {
-      0%, 100% { filter: drop-shadow(0 0 32px rgba(167, 139, 250, 0.35)); }
-      50% { filter: drop-shadow(0 0 48px rgba(167, 139, 250, 0.55)); }
-    }
+/* ===== PHONES: lighter effects + safe sizing ===== */
+@media (max-width:640px){
+body{padding:.85rem;padding-bottom:max(.85rem,env(safe-area-inset-bottom));}
+header{margin-bottom:.8rem;}
+.main-image-wrapper{
+border-radius:18px;
+height:clamp(200px,calc(100vh - 270px),520px);
+height:clamp(200px,calc(100dvh - 270px),520px);
+}
+.controls{gap:.9rem;margin-top:1rem;}
+.btn{flex:1;min-width:0;max-width:180px;}
+.hint,.orb,#geometryContainer{display:none;}
+#ambientLight{animation:none;filter:blur(40px);}
+.noise{display:none;}
+h1{filter:none;}
+}
 
-    .subtitle {
-      color: var(--text-muted);
-      font-size: 1.08rem;
-      font-weight: 400;
-      max-width: 540px;
-      margin: 0 auto;
-      letter-spacing: 0.2px;
-      opacity: 0.9;
-    }
-
-    .gallery-container {
-      max-width: 1120px;
-      width: 100%;
-      margin: 0 auto;
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      min-height: 0;
-      opacity: 0;
-      transform: translateY(32px);
-      animation: enterUp 0.95s cubic-bezier(0.22, 1, 0.36, 1) 0.4s forwards;
-    }
-
-    @keyframes enterUp {
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    .main-image-wrapper {
-      position: relative;
-      width: 100%;
-      height: clamp(260px, 58vh, 600px);
-      border-radius: 24px;
-      overflow: hidden;
-      background: var(--surface);
-      box-shadow:
-        0 0 0 1px rgba(255, 255, 255, 0.1),
-        0 8px 40px rgba(0, 0, 0, 0.6),
-        0 32px 100px rgba(0, 0, 0, 0.7),
-        0 0 120px rgba(167, 139, 250, 0.2),
-        inset 0 1px 0 rgba(255, 255, 255, 0.08);
-      isolation: isolate;
-      transition: all 0.45s cubic-bezier(0.22, 1, 0.36, 1);
-      will-change: transform;
-    }
-
-    .main-image-wrapper::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      border-radius: inherit;
-      padding: 2px;
-      background: linear-gradient(
-        145deg,
-        rgba(255, 255, 255, 0.4) 0%,
-        rgba(255, 255, 255, 0.1) 20%,
-        transparent 40%,
-        transparent 60%,
-        rgba(167, 139, 250, 0.5) 80%,
-        rgba(34, 211, 238, 0.3) 100%
-      );
-      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-      mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-      -webkit-mask-composite: xor;
-      mask-composite: exclude;
-      pointer-events: none;
-      z-index: 3;
-      animation: rimGlow 4s ease-in-out infinite;
-    }
-
-    @keyframes rimGlow {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.7; }
-    }
-
-    .main-image-wrapper::after {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 8%;
-      right: 8%;
-      height: 2px;
-      background: linear-gradient(
-        90deg,
-        transparent,
-        rgba(255, 255, 255, 0.6),
-        rgba(167, 139, 250, 0.5),
-        transparent
-      );
-      z-index: 4;
-      pointer-events: none;
-      animation: highlightShimmer 3s ease-in-out infinite;
-    }
-
-    @keyframes highlightShimmer {
-      0%, 100% { opacity: 0.5; transform: translateX(-10px); }
-      50% { opacity: 1; transform: translateX(10px); }
-    }
-
-    .main-image {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-      object-position: center;
-      opacity: 0;
-      transform: scale(1.08);
-      filter: blur(8px);
-      transition: 
-        opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
-        transform 0.9s cubic-bezier(0.22, 1, 0.36, 1),
-        filter 0.7s cubic-bezier(0.22, 1, 0.36, 1);
-      will-change: opacity, transform, filter;
-      background: #08080e;
-    }
-
-    .main-image.active {
-      opacity: 1;
-      transform: scale(1);
-      filter: blur(0);
-    }
-
-    .main-image.error {
-      opacity: 0.35;
-      object-fit: contain;
-      background: repeating-linear-gradient(
-        45deg,
-        #15151c,
-        #15151c 12px,
-        #0e0e14 12px,
-        #0e0e14 24px
-      );
-      filter: none;
-    }
-
-    .loading-overlay {
-      position: absolute;
-      inset: 0;
-      background: rgba(6, 6, 10, 0.85);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 1.1rem;
-      color: var(--text-muted);
-      font-size: 0.95rem;
-      font-weight: 500;
-      letter-spacing: 0.3px;
-      pointer-events: none;
-      transition: opacity 0.45s ease;
-      opacity: 1;
-      z-index: 2;
-    }
-
-    .loading-overlay.hidden {
-      opacity: 0;
-      pointer-events: none;
-    }
-
-    .spinner {
-      width: 40px;
-      height: 40px;
-      border: 3px solid rgba(255, 255, 255, 0.08);
-      border-top-color: var(--accent);
-      border-right-color: var(--accent-cyan);
-      border-bottom-color: var(--accent-magenta);
-      border-radius: 50%;
-      animation: spinAdvanced 0.8s linear infinite;
-      box-shadow: 
-        0 0 24px var(--accent-soft), 
-        0 0 8px rgba(103, 232, 249, 0.4),
-        inset 0 0 12px rgba(167, 139, 250, 0.2);
-    }
-
-    @keyframes spinAdvanced {
-      0% { transform: rotate(0deg) scale(1); }
-      50% { transform: rotate(180deg) scale(1.05); }
-      100% { transform: rotate(360deg) scale(1); }
-    }
-
-    .controls {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 1.5rem;
-      margin: 1.5rem 0 0.75rem;
-      flex-wrap: wrap;
-      opacity: 0;
-      transform: translateY(16px);
-      animation: enterUp 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.6s forwards;
-    }
-
-    .btn {
-      position: relative;
-      padding: 0.92rem 2.3rem;
-      font-size: 0.98rem;
-      font-weight: 600;
-      font-family: inherit;
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      background: linear-gradient(
-        180deg,
-        rgba(255, 255, 255, 0.12) 0%,
-        rgba(255, 255, 255, 0.04) 100%
-      );
-      color: var(--text);
-      border-radius: 999px;
-      cursor: pointer;
-      transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      overflow: hidden;
-      letter-spacing: 0.3px;
-      box-shadow:
-        0 4px 15px rgba(0, 0, 0, 0.4),
-        0 0 30px rgba(167, 139, 250, 0.1),
-        inset 0 1px 0 rgba(255, 255, 255, 0.12);
-    }
-
-    .btn::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(
-        120deg,
-        transparent 0%,
-        rgba(255, 255, 255, 0.25) 45%,
-        transparent 90%
-      );
-      opacity: 0;
-      transition: opacity 0.35s ease;
-      transform: translateX(-30%);
-    }
-
-    .btn:hover:not(:disabled)::before {
-      opacity: 1;
-      animation: lightSweep 0.6s ease;
-    }
-
-    @keyframes lightSweep {
-      from { transform: translateX(-100%); }
-      to { transform: translateX(100%); }
-    }
-
-    .btn:hover:not(:disabled) {
-      background: linear-gradient(
-        180deg,
-        rgba(255, 255, 255, 0.18) 0%,
-        rgba(255, 255, 255, 0.06) 100%
-      );
-      border-color: rgba(167, 139, 250, 0.6);
-      transform: translateY(-4px) scale(1.03);
-      box-shadow:
-        0 16px 50px rgba(0, 0, 0, 0.5),
-        0 0 50px rgba(167, 139, 250, 0.3),
-        0 0 25px rgba(103, 232, 249, 0.2),
-        inset 0 1px 0 rgba(255, 255, 255, 0.2);
-    }
-
-    .btn:active:not(:disabled) {
-      transform: translateY(-1px) scale(0.98);
-    }
-
-    .btn:disabled {
-      opacity: 0.25;
-      cursor: not-allowed;
-      box-shadow: none;
-    }
-
-    .counter {
-      text-align: center;
-      color: var(--text-muted);
-      font-size: 0.98rem;
-      font-weight: 600;
-      letter-spacing: 1.6px;
-      font-variant-numeric: tabular-nums;
-      opacity: 0;
-      animation: enterUp 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.75s forwards;
-    }
-
-    .counter span {
-      color: var(--text);
-      font-weight: 700;
-      text-shadow: 0 0 24px rgba(167, 139, 250, 0.45);
-    }
-
-    .hint {
-      text-align: center;
-      margin-top: 1rem;
-      font-size: 0.78rem;
-      color: rgba(154, 154, 171, 0.5);
-      letter-spacing: 0.6px;
-      font-weight: 400;
-      opacity: 0;
-      animation: enterUp 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.9s forwards;
-    }
-
-    .hint kbd {
-      display: inline-block;
-      padding: 0.14rem 0.45rem;
-      margin: 0 0.18rem;
-      font-size: 0.72rem;
-      font-family: inherit;
-      background: rgba(255, 255, 255, 0.08);
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      border-radius: 6px;
-      color: rgba(220, 220, 235, 0.9);
-      box-shadow: 
-        inset 0 1px 0 rgba(255, 255, 255, 0.1),
-        0 1px 3px rgba(0, 0, 0, 0.3);
-    }
-
-    @media (max-width: 640px) {
-      body { padding: 0.85rem; }
-      .main-image-wrapper { 
-        height: clamp(230px, 52vh, 480px); 
-        border-radius: 18px; 
-      }
-      .btn { 
-        padding: 0.8rem 1.7rem; 
-        font-size: 0.93rem; 
-      }
-      .hint { display: none; }
-      h1 { font-size: 1.85rem; }
-      .orb { display: none; }
-      #geometryContainer { display: none; }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      * { animation: none !important; transition: none !important; }
-      header,
-      .gallery-container,
-      .controls,
-      .counter,
-      .hint {
-        opacity: 1 !important;
-        transform: none !important;
-      }
-    }
-  </style>
+@media (prefers-reduced-motion:reduce){
+*{animation:none !important;transition:none !important;}
+header,.gallery-container,.controls,.counter,.hint{opacity:1 !important;transform:none !important;}
+}
+</style>
 </head>
 <body>
 
-  <!-- Background layers -->
-  <div class="bg-layer">
-    <svg id="ambientLight" viewBox="0 0 1200 800">
-      <defs>
-        <radialGradient id="grad1" cx="50%" cy="50%" r="60%">
-          <stop offset="0%" style="stop-color:rgba(167,139,250,0.4);stop-opacity:1" />
-          <stop offset="50%" style="stop-color:rgba(167,139,250,0.1);stop-opacity:1" />
-          <stop offset="100%" style="stop-color:rgba(167,139,250,0);stop-opacity:1" />
-        </radialGradient>
-        <radialGradient id="grad2" cx="50%" cy="50%" r="60%">
-          <stop offset="0%" style="stop-color:rgba(103,232,249,0.3);stop-opacity:1" />
-          <stop offset="60%" style="stop-color:rgba(103,232,249,0.05);stop-opacity:1" />
-          <stop offset="100%" style="stop-color:rgba(103,232,249,0);stop-opacity:1" />
-        </radialGradient>
-        <radialGradient id="grad3" cx="50%" cy="50%" r="60%">
-          <stop offset="0%" style="stop-color:rgba(232,121,249,0.25);stop-opacity:1" />
-          <stop offset="50%" style="stop-color:rgba(232,121,249,0.05);stop-opacity:1" />
-          <stop offset="100%" style="stop-color:rgba(232,121,249,0);stop-opacity:1" />
-        </radialGradient>
-      </defs>
-      <ellipse cx="200" cy="150" rx="300" ry="350" fill="url(#grad1)"/>
-      <ellipse cx="1000" cy="600" rx="280" ry="320" fill="url(#grad2)"/>
-      <ellipse cx="600" cy="200" rx="320" ry="280" fill="url(#grad3)"/>
-    </svg>
-  </div>
+<!-- Background -->
+<div class="bg-layer">
+<svg id="ambientLight" viewBox="0 0 1200 800">
+<defs>
+<radialGradient id="grad1" cx="50%" cy="50%" r="60%">
+<stop offset="0%" style="stop-color:rgba(167,139,250,0.4)"/>
+<stop offset="50%" style="stop-color:rgba(167,139,250,0.1)"/>
+<stop offset="100%" style="stop-color:rgba(167,139,250,0)"/>
+</radialGradient>
+<radialGradient id="grad2" cx="50%" cy="50%" r="60%">
+<stop offset="0%" style="stop-color:rgba(103,232,249,0.3)"/>
+<stop offset="60%" style="stop-color:rgba(103,232,249,0.05)"/>
+<stop offset="100%" style="stop-color:rgba(103,232,249,0)"/>
+</radialGradient>
+<radialGradient id="grad3" cx="50%" cy="50%" r="60%">
+<stop offset="0%" style="stop-color:rgba(232,121,249,0.25)"/>
+<stop offset="50%" style="stop-color:rgba(232,121,249,0.05)"/>
+<stop offset="100%" style="stop-color:rgba(232,121,249,0)"/>
+</radialGradient>
+</defs>
+<ellipse cx="200" cy="150" rx="300" ry="350" fill="url(#grad1)"/>
+<ellipse cx="1000" cy="600" rx="280" ry="320" fill="url(#grad2)"/>
+<ellipse cx="600" cy="200" rx="320" ry="280" fill="url(#grad3)"/>
+</svg>
+</div>
 
-  <!-- Particle Canvas -->
-  <canvas id="particleCanvas"></canvas>
+<canvas id="particleCanvas"></canvas>
+<div id="geometryContainer"></div>
 
-  <!-- 3D Geometry -->
-  <div id="geometryContainer"></div>
+<div class="orbs-layer">
+<div class="orb"></div><div class="orb"></div><div class="orb"></div><div class="orb"></div>
+</div>
 
-  <!-- Floating Orbs -->
-  <div class="orbs-layer">
-    <div class="orb"></div>
-    <div class="orb"></div>
-    <div class="orb"></div>
-    <div class="orb"></div>
-  </div>
+<div class="vignette"></div>
+<div class="scanlines"></div>
+<div class="noise"></div>
 
-  <!-- Effects -->
-  <div class="vignette"></div>
-  <div class="scanlines"></div>
-  <div class="noise"></div>
+<!-- Content -->
+<header>
+<h1>Project Gallery</h1>
+<p class="subtitle">Explore our creative universe</p>
+</header>
 
-  <!-- Content -->
-  <header>
-    <h1>Project Gallery</h1>
-    <p class="subtitle">Explore our creative universe</p>
-  </header>
+<div class="gallery-container">
 
-  <div class="gallery-container">
-    <div class="main-image-wrapper" id="imageWrapper">
-      <div class="loading-overlay" id="loader">
-        <div class="spinner"></div>
-        <span>Loading...</span>
-      </div>
-    </div>
+<div class="main-image-wrapper" id="imageWrapper">
+<img class="main-image" id="mainImg" alt="Project image" decoding="async">
+<div class="loading-overlay" id="loader">
+<div class="spinner"></div>
+<span id="loaderText">Loading...</span>
+</div>
+</div>
 
-    <div class="controls">
-      <button class="btn" id="prevBtn" disabled>← Previous</button>
-      <button class="btn" id="nextBtn">Next →</button>
-    </div>
+<div class="controls">
+<button class="btn" id="prevBtn" disabled>← Previous</button>
+<button class="btn" id="nextBtn">Next →</button>
+</div>
 
-    <div class="counter" id="counter"><span>1</span> / ?</div>
-    <p class="hint">Use <kbd>←</kbd> <kbd>→</kbd> arrow keys to navigate</p>
-  </div>
+<div class="counter" id="counter"><span>1</span> / 76</div>
+<p class="hint">Use <kbd>←</kbd> <kbd>→</kbd> arrow keys to navigate</p>
 
-  <script>
-    // ═══════════════════════════════════════════════════════════════
-    // ENHANCED 3D PARTICLE SYSTEM
-    // ═══════════════════════════════════════════════════════════════
-    class ParticleSystem {
-      constructor(canvasId) {
-        this.canvas = document.getElementById(canvasId);
-        this.ctx = this.canvas.getContext('2d', { alpha: true });
-        this.particles = [];
-        this.mouse = { x: -9999, y: -9999 };
-        this.dpr = Math.min(window.devicePixelRatio || 1, 2);
-        this.time = 0;
-        
-        this.colors = [
-          { r: 167, g: 139, b: 250 },
-          { r: 103, g: 232, b: 249 },
-          { r: 232, g: 121, b: 249 },
-          { r: 129, g: 140, b: 248 },
-          { r: 94, g: 234, b: 212 },
-          { r: 192, g: 132, b: 252 },
-          { r: 34, g: 211, b: 238 },
-        ];
-        
-        this.init();
-        this.setupEventListeners();
-        this.animate();
-      }
+</div>
 
-      init() {
-        this.resize();
-        const count = Math.min(150, Math.floor((this.w * this.h) / 8000));
-        for (let i = 0; i < count; i++) {
-          this.particles.push(this.createParticle());
-        }
-      }
+<script>
+/* =====================================================
+   GALLERY (runs first, so the image gets priority)
+   - Only ONE image is on screen / in memory at a time
+   - Next, previous and +2 are preloaded AFTER the current one is shown
+   - Failed images retry automatically, then show "Tap to retry"
+   - Swipe left / right on phones, arrow keys on desktop
+   ===================================================== */
+const files = [];
+for (let i = 1; i <= 27; i++) files.push('pn' + i + '.jpeg');
+for (let i = 1; i <= 49; i++) files.push('p' + i + '.jpeg');
 
-      resize() {
-        this.w = window.innerWidth;
-        this.h = window.innerHeight;
-        this.canvas.width = this.w * this.dpr;
-        this.canvas.height = this.h * this.dpr;
-        this.canvas.style.width = this.w + 'px';
-        this.canvas.style.height = this.h + 'px';
-        this.ctx.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
-      }
+const mainImg    = document.getElementById('mainImg');
+const loader     = document.getElementById('loader');
+const loaderText = document.getElementById('loaderText');
+const counterEl  = document.getElementById('counter');
+const prevBtn    = document.getElementById('prevBtn');
+const nextBtn    = document.getElementById('nextBtn');
+const wrapper    = document.getElementById('imageWrapper');
 
-      createParticle() {
-        const depth = 0.2 + Math.random() * 0.8;
-        const size = (8 + Math.random() * 28) * depth;
-        const color = this.colors[Math.floor(Math.random() * this.colors.length)];
-        const angle = Math.random() * Math.PI * 2;
-        const speed = 0.2 + Math.random() * 0.6;
-        
-        return {
-          x: Math.random() * this.w,
-          y: Math.random() * this.h,
-          vx: Math.cos(angle) * speed * depth,
-          vy: Math.sin(angle) * speed * depth - 0.15,
-          size,
-          depth,
-          color,
-          alpha: 0.05 + Math.random() * 0.25 * depth,
-          rotation: Math.random() * Math.PI * 2,
-          rotSpeed: (Math.random() - 0.5) * 0.012,
-          pulse: Math.random() * Math.PI * 2,
-          wobble: Math.random() * Math.PI * 2,
-          maxAlpha: 0.05 + Math.random() * 0.25 * depth,
-        };
-      }
+let current = 0;
+let token = 0;                 // ignores results of outdated taps
+const cache = new Map();       // index -> Promise<Image>
 
-      drawParticle(p) {
-        const { x, y, size, color, alpha, depth, rotation, pulse, wobble } = p;
-        const pulseFactor = 0.7 + 0.3 * Math.sin(pulse);
-        const wobbleFactor = 0.1 * Math.sin(wobble);
-        const finalAlpha = alpha * pulseFactor * (0.6 + 0.4 * (1 - depth));
+function fetchImage(idx, attempt = 0) {
+  if (attempt === 0 && cache.has(idx)) return cache.get(idx);
 
-        this.ctx.save();
-        this.ctx.translate(x, y + wobbleFactor);
-        this.ctx.rotate(rotation);
-        this.ctx.globalAlpha = finalAlpha;
-
-        // Glow effect
-        this.ctx.shadowColor = `rgba(${color.r},${color.g},${color.b},0.8)`;
-        this.ctx.shadowBlur = 20 * depth + 8;
-        this.ctx.shadowOffsetX = 0;
-        this.ctx.shadowOffsetY = 0;
-
-        // Radial gradient
-        const grad = this.ctx.createRadialGradient(0, 0, 0, 0, 0, size / 2);
-        grad.addColorStop(0, `rgba(${color.r},${color.g},${color.b},1)`);
-        grad.addColorStop(0.4, `rgba(${color.r},${color.g},${color.b},0.6)`);
-        grad.addColorStop(1, `rgba(${color.r},${color.g},${color.b},0)`);
-        this.ctx.fillStyle = grad;
-
-        this.ctx.beginPath();
-        this.ctx.arc(0, 0, size / 2, 0, Math.PI * 2);
-        this.ctx.fill();
-
-        // Inner bright core
-        this.ctx.globalAlpha = finalAlpha * 0.5;
-        this.ctx.fillStyle = `rgba(255, 255, 255, 0.8)`;
-        this.ctx.beginPath();
-        this.ctx.arc(0, 0, size / 6, 0, Math.PI * 2);
-        this.ctx.fill();
-
-        this.ctx.restore();
-      }
-
-      updateParticle(p) {
-        // Mouse repulsion
-        const dx = p.x - this.mouse.x;
-        const dy = p.y - this.mouse.y;
-        const dist = Math.hypot(dx, dy);
-        
-        if (dist < 250) {
-          const force = (1 - dist / 250) * 0.5;
-          const angle = Math.atan2(dy, dx);
-          p.vx += Math.cos(angle) * force * 0.8;
-          p.vy += Math.sin(angle) * force * 0.8;
-        }
-
-        // Damping and physics
-        p.vx *= 0.988;
-        p.vy *= 0.988;
-        p.x += p.vx;
-        p.y += p.vy;
-
-        // Rotation and pulse
-        p.rotation += p.rotSpeed;
-        p.pulse += 0.016;
-        p.wobble += 0.008;
-
-        // Wrap around
-        const margin = 100;
-        if (p.y < -margin) p.y = this.h + margin;
-        if (p.y > this.h + margin) p.y = -margin;
-        if (p.x < -margin) p.x = this.w + margin;
-        if (p.x > this.w + margin) p.x = -margin;
-      }
-
-      setupEventListeners() {
-        window.addEventListener('mousemove', (e) => {
-          this.mouse.x = e.clientX;
-          this.mouse.y = e.clientY;
-        });
-
-        window.addEventListener('mouseleave', () => {
-          this.mouse.x = -9999;
-          this.mouse.y = -9999;
-        });
-
-        window.addEventListener('resize', () => this.resize());
-      }
-
-      animate() {
-        this.ctx.clearRect(0, 0, this.w, this.h);
-        
-        for (const p of this.particles) {
-          this.updateParticle(p);
-          this.drawParticle(p);
-        }
-
-        this.time++;
-        requestAnimationFrame(() => this.animate());
-      }
+  const p = new Promise((resolve, reject) => {
+    const im = new Image();
+    im.decoding = 'async';
+    im.onload = () => resolve(im);
+    im.onerror = () => reject(new Error('load failed'));
+    im.src = files[idx] + (attempt ? '?r=' + attempt + '_' + Date.now() : '');
+  }).catch(err => {
+    if (attempt < 2) {
+      return new Promise(r => setTimeout(r, 700 * (attempt + 1)))
+        .then(() => fetchImage(idx, attempt + 1));
     }
+    cache.delete(idx);
+    throw err;
+  });
 
-    new ParticleSystem('particleCanvas');
+  if (attempt === 0) cache.set(idx, p);
+  return p;
+}
 
-    // ═══════════════════════════════════════════════════════════════
-    // 3D GEOMETRIC SHAPES
-    // ═══════════════════════════════════════════════════════════════
-    class GeometricShape {
-      constructor(x, y, size, color, duration) {
-        this.element = document.createElement('div');
-        this.x = x;
-        this.y = y;
-        this.size = size;
-        this.color = color;
-        this.duration = duration;
-        this.time = 0;
-        this.rotX = Math.random() * Math.PI * 2;
-        this.rotY = Math.random() * Math.PI * 2;
-        this.rotZ = Math.random() * Math.PI * 2;
-        this.rotSpeedX = (Math.random() - 0.5) * 0.005;
-        this.rotSpeedY = (Math.random() - 0.5) * 0.005;
-        this.rotSpeedZ = (Math.random() - 0.5) * 0.005;
-        
-        this.createShape();
-        document.getElementById('geometryContainer').appendChild(this.element);
-      }
+function trimCache(idx) {            // free memory on small phones
+  for (const k of Array.from(cache.keys())) {
+    if (k < idx - 2 || k > idx + 3) cache.delete(k);
+  }
+}
 
-      createShape() {
-        this.element.className = 'geometric-shape';
-        this.element.innerHTML = `
-          <svg width="${this.size}" height="${this.size}" viewBox="0 0 100 100">
-            <defs>
-              <linearGradient id="grad${Math.random()}" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" style="stop-color:${this.color};stop-opacity:0.8" />
-                <stop offset="100%" style="stop-color:${this.color};stop-opacity:0.2" />
-              </linearGradient>
-            </defs>
-            <path d="M50,10 L90,90 L10,90 Z" fill="url(#grad${Math.random()})" stroke="${this.color}" stroke-width="2" opacity="0.6"/>
-          </svg>
-        `;
-        this.element.style.left = this.x + 'px';
-        this.element.style.top = this.y + 'px';
-        this.element.style.width = this.size + 'px';
-        this.element.style.height = this.size + 'px';
-      }
+function setLoader(show, msg, isError) {
+  loader.classList.toggle('hidden', !show);
+  loader.classList.toggle('error', !!isError);
+  if (msg) loaderText.textContent = msg;
+}
 
-      update() {
-        this.time += 0.016;
-        const progress = (this.time % this.duration) / this.duration;
-        
-        this.rotX += this.rotSpeedX;
-        this.rotY += this.rotSpeedY;
-        this.rotZ += this.rotSpeedZ;
-        
-        const float = Math.sin(progress * Math.PI * 2) * 30;
-        const scale = 0.8 + Math.sin(progress * Math.PI * 2) * 0.2;
-        
-        this.element.style.transform = `
-          translate(${this.x}px, ${this.y + float}px)
-          rotateX(${this.rotX}rad)
-          rotateY(${this.rotY}rad)
-          rotateZ(${this.rotZ}rad)
-          scale(${scale})
-        `;
-        this.element.style.opacity = 0.4 + 0.3 * Math.sin(progress * Math.PI * 2);
-      }
-    }
+function showImage(idx) {
+  if (idx < 0 || idx >= files.length) return;
 
-    // Create floating shapes
-    const shapes = [];
-    const colors = ['rgba(167,139,250,0.8)', 'rgba(103,232,249,0.8)', 'rgba(232,121,249,0.8)', 'rgba(129,140,248,0.8)'];
-    
-    for (let i = 0; i < 6; i++) {
-      const x = Math.random() * window.innerWidth;
-      const y = Math.random() * window.innerHeight;
-      const size = 40 + Math.random() * 80;
-      const color = colors[Math.floor(Math.random() * colors.length)];
-      const duration = 8 + Math.random() * 6;
-      shapes.push(new GeometricShape(x, y, size, color, duration));
-    }
+  current = idx;
+  const t = ++token;
 
-    function animateShapes() {
-      for (const shape of shapes) {
-        shape.update();
-      }
-      requestAnimationFrame(animateShapes);
-    }
-    animateShapes();
+  counterEl.innerHTML = '<span>' + (idx + 1) + '</span> / ' + files.length;
+  prevBtn.disabled = idx === 0;
+  nextBtn.disabled = idx === files.length - 1;
 
-    // ═══════════════════════════════════════════════════════════════
-    // LIGHT TILT EFFECT
-    // ═══════════════════════════════════════════════════════════════
-    const wrapper = document.getElementById('imageWrapper');
-    let targetX = 0, targetY = 0;
-    let currentX = 0, currentY = 0;
+  mainImg.classList.remove('active');
+  setLoader(true, 'Loading...', false);
+  trimCache(idx);
 
-    if (wrapper && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      document.addEventListener('mousemove', e => {
-        const rect = wrapper.getBoundingClientRect();
-        const cx = rect.left + rect.width / 2;
-        const cy = rect.top + rect.height / 2;
-        targetX = (e.clientX - cx) / rect.width * 8;
-        targetY = (e.clientY - cy) / rect.height * 5;
+  fetchImage(idx)
+    .then(im => {
+      if (t !== token) return false;
+      mainImg.alt = 'Project ' + (idx + 1);
+      mainImg.src = im.src;
+      const ready = mainImg.decode ? mainImg.decode() : Promise.resolve();
+      return ready.catch(() => {}).then(() => t === token);
+    })
+    .then(ok => {
+      if (!ok) return;
+      mainImg.classList.add('active');
+      setLoader(false);
+      startEffects();
+      [1, -1, 2].forEach(d => {           // preload neighbours, one after another is not needed: current is done
+        const j = idx + d;
+        if (j >= 0 && j < files.length) fetchImage(j).catch(() => {});
       });
-
-      document.addEventListener('mouseleave', () => {
-        targetX = 0;
-        targetY = 0;
-      });
-
-      function animateTilt() {
-        currentX += (targetX - currentX) * 0.1;
-        currentY += (targetY - currentY) * 0.1;
-        wrapper.style.transform = `perspective(1200px) rotateY(${currentX}deg) rotateX(${-currentY}deg)`;
-        requestAnimationFrame(animateTilt);
-      }
-      animateTilt();
-    }
-
-    // ═══════════════════════════════════════════════════════════════
-    // GALLERY LOGIC
-    // ═══════════════════════════════════════════════════════════════
-    const projects = [
-      { src: "pn1.jpeg", alt: "Neon UI concept" },
-      { src: "pn2.jpeg", alt: "Neon UI concept" },
-      { src: "pn3.jpeg", alt: "Neon UI concept" },
-      { src: "pn4.jpeg", alt: "Neon UI concept" },
-      { src: "pn5.jpeg", alt: "Neon UI concept" },
-      { src: "pn6.jpeg", alt: "Neon UI concept" },
-      { src: "pn7.jpeg", alt: "Neon UI concept" },
-      { src: "pn8.jpeg", alt: "Neon UI concept" },
-      { src: "pn9.jpeg", alt: "Neon UI concept" },
-      { src: "pn10.jpeg", alt: "Neon UI concept" },
-      { src: "pn11.jpeg", alt: "Neon UI concept" },
-      { src: "pn12.jpeg", alt: "Neon UI concept" },
-      { src: "pn13.jpeg", alt: "Neon UI concept" },
-      { src: "pn14.jpeg", alt: "Neon UI concept" },
-      { src: "pn15.jpeg", alt: "Neon UI concept" },
-      { src: "pn16.jpeg", alt: "Neon UI concept" },
-      { src: "pn17.jpeg", alt: "Neon UI concept" },
-      { src: "pn18.jpeg", alt: "Neon UI concept" },
-      { src: "pn19.jpeg", alt: "Neon UI concept" },
-      { src: "pn20.jpeg", alt: "Neon UI concept" },
-      { src: "pn21.jpeg", alt: "Neon UI concept" },
-      { src: "pn22.jpeg", alt: "Neon UI concept" },
-      { src: "pn23.jpeg", alt: "Neon UI concept" },
-      { src: "pn24.jpeg", alt: "Neon UI concept" },
-      { src: "pn25.jpeg", alt: "Neon UI concept" },
-      { src: "pn26.jpeg", alt: "Neon UI concept" },
-      { src: "pn27.jpeg", alt: "Neon UI concept" },
-      { src: "p1.jpeg", alt: "Code on dark screen" },
-      { src: "p2.jpeg", alt: "Laptop with colorful terminal" },
-      { src: "p3.jpeg", alt: "Abstract digital art" },
-      { src: "p4.jpeg", alt: "Neon UI concept" },
-      { src: "p5.jpeg", alt: "Neon UI concept" },
-      { src: "p6.jpeg", alt: "Neon UI concept" },
-      { src: "p7.jpeg", alt: "Neon UI concept" },
-      { src: "p8.jpeg", alt: "Neon UI concept" },
-      { src: "p9.jpeg", alt: "Neon UI concept" },
-      { src: "p10.jpeg", alt: "Neon UI concept" },
-      { src: "p11.jpeg", alt: "Neon UI concept" },
-      { src: "p12.jpeg", alt: "Neon UI concept" },
-      { src: "p13.jpeg", alt: "Neon UI concept" },
-      { src: "p14.jpeg", alt: "Neon UI concept" },
-      { src: "p15.jpeg", alt: "Neon UI concept" },
-      { src: "p16.jpeg", alt: "Neon UI concept" },
-      { src: "p17.jpeg", alt: "Neon UI concept" },
-      { src: "p18.jpeg", alt: "Neon UI concept" },
-      { src: "p19.jpeg", alt: "Neon UI concept" },
-      { src: "p20.jpeg", alt: "Neon UI concept" },
-      { src: "p21.jpeg", alt: "Neon UI concept" },
-      { src: "p22.jpeg", alt: "Neon UI concept" },
-      { src: "p23.jpeg", alt: "Neon UI concept" },
-      { src: "p24.jpeg", alt: "Neon UI concept" },
-      { src: "p25.jpeg", alt: "Neon UI concept" },
-      { src: "p26.jpeg", alt: "Neon UI concept" },
-      { src: "p27.jpeg", alt: "Neon UI concept" },
-      { src: "p28.jpeg", alt: "Neon UI concept" },
-      { src: "p29.jpeg", alt: "Neon UI concept" },
-      { src: "p30.jpeg", alt: "Neon UI concept" },
-      { src: "p31.jpeg", alt: "Neon UI concept" },
-      { src: "p32.jpeg", alt: "Neon UI concept" },
-      { src: "p33.jpeg", alt: "Neon UI concept" },
-      { src: "p34.jpeg", alt: "Neon UI concept" },
-      { src: "p35.jpeg", alt: "Neon UI concept" },
-      { src: "p36.jpeg", alt: "Neon UI concept" },
-      { src: "p37.jpeg", alt: "Neon UI concept" },
-      { src: "p38.jpeg", alt: "Neon UI concept" },
-      { src: "p39.jpeg", alt: "Neon UI concept" },
-      { src: "p40.jpeg", alt: "Neon UI concept" },
-      { src: "p41.jpeg", alt: "Neon UI concept" },
-      { src: "p42.jpeg", alt: "Neon UI concept" },
-      { src: "p43.jpeg", alt: "Neon UI concept" },
-      { src: "p44.jpeg", alt: "Neon UI concept" },
-      { src: "p45.jpeg", alt: "Neon UI concept" },
-      { src: "p46.jpeg", alt: "Neon UI concept" },
-      { src: "p47.jpeg", alt: "Neon UI concept" },
-      { src: "p48.jpeg", alt: "Neon UI concept" },
-      { src: "p49.jpeg", alt: "Neon UI concept" },
-    ];
-
-    let currentIndex = 0;
-    const imageWrapper = document.getElementById('imageWrapper');
-    const loader = document.getElementById('loader');
-    const counterEl = document.getElementById('counter');
-    const prevBtn = document.getElementById('prevBtn');
-    const nextBtn = document.getElementById('nextBtn');
-
-    projects.forEach((project, i) => {
-      const img = new Image();
-      img.src = project.src;
-      img.alt = project.alt || `Project ${i + 1}`;
-      img.className = 'main-image';
-      if (i === 0) {
-        img.classList.add('active');
-        img.onload = () => loader.classList.add('hidden');
-        img.onerror = () => img.classList.add('error');
-      }
-      imageWrapper.appendChild(img);
+    })
+    .catch(() => {
+      if (t !== token) return;
+      setLoader(true, 'Could not load this image. Tap to retry.', true);
     });
+}
 
-    const allImages = document.querySelectorAll('.main-image');
+loader.addEventListener('click', () => {
+  if (loader.classList.contains('error')) showImage(current);
+});
 
-    function showImage(idx) {
-      if (idx < 0 || idx >= projects.length) return;
+prevBtn.addEventListener('click', () => showImage(current - 1));
+nextBtn.addEventListener('click', () => showImage(current + 1));
 
-      allImages.forEach(img => img.classList.remove('active'));
-      const targetImg = allImages[idx];
-      targetImg.classList.add('active');
+window.addEventListener('keydown', e => {
+  if (e.key === 'ArrowLeft')  showImage(current - 1);
+  if (e.key === 'ArrowRight') showImage(current + 1);
+});
 
-      if (!targetImg.complete) {
-        loader.classList.remove('hidden');
-        targetImg.onload = () => loader.classList.add('hidden');
-        targetImg.onerror = () => {
-          targetImg.classList.add('error');
-          loader.classList.add('hidden');
-        };
-      } else {
-        loader.classList.add('hidden');
-      }
+/* swipe */
+let sx = 0, sy = 0;
+wrapper.addEventListener('touchstart', e => {
+  sx = e.touches[0].clientX; sy = e.touches[0].clientY;
+}, { passive: true });
+wrapper.addEventListener('touchend', e => {
+  const dx = e.changedTouches[0].clientX - sx;
+  const dy = e.changedTouches[0].clientY - sy;
+  if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.5) {
+    showImage(current + (dx < 0 ? 1 : -1));
+  }
+}, { passive: true });
 
-      currentIndex = idx;
-      counterEl.innerHTML = `<span>${idx + 1}</span> / ${projects.length}`;
+showImage(0);
 
-      prevBtn.disabled = idx === 0;
-      nextBtn.disabled = idx === projects.length - 1;
-    }
+/* =====================================================
+   BACKGROUND EFFECTS - started only after the first image
+   is on screen, and kept light on phones
+   ===================================================== */
+const isSmall = window.innerWidth <= 640;
+let fxStarted = false;
 
-    prevBtn.addEventListener('click', () => showImage(currentIndex - 1));
-    nextBtn.addEventListener('click', () => showImage(currentIndex + 1));
+function startEffects() {
+  if (fxStarted) return;
+  fxStarted = true;
+  new ParticleSystem('particleCanvas');
+  if (!isSmall) { startShapes(); startTilt(); }
+}
+setTimeout(startEffects, 4000);   // safety net
 
-    window.addEventListener('keydown', e => {
-      if (e.key === 'ArrowLeft') showImage(currentIndex - 1);
-      if (e.key === 'ArrowRight') showImage(currentIndex + 1);
+class ParticleSystem {
+  constructor(id) {
+    this.c = document.getElementById(id);
+    this.ctx = this.c.getContext('2d');
+    this.dpr = Math.min(window.devicePixelRatio || 1, isSmall ? 1.5 : 2);
+    this.colors = [[167,139,250],[103,232,249],[232,121,249],[129,140,248],[94,234,212]];
+    this.mouse = { x: -9999, y: -9999 };
+    this.ps = [];
+    this.raf = 0;
+    this.lastW = window.innerWidth;
+    this.resize();
+
+    const n = Math.min(isSmall ? 35 : 150, Math.floor((this.w * this.h) / 8000));
+    for (let i = 0; i < n; i++) this.ps.push(this.make());
+
+    window.addEventListener('mousemove', e => { this.mouse.x = e.clientX; this.mouse.y = e.clientY; });
+    window.addEventListener('resize', () => {
+      if (window.innerWidth !== this.lastW) { this.lastW = window.innerWidth; this.resize(); }
     });
+    document.addEventListener('visibilitychange', () => { if (!document.hidden && !this.raf) this.loop(); });
+    this.loop();
+  }
 
-    showImage(0);
-  </script>
+  resize() {
+    this.w = window.innerWidth;
+    this.h = window.innerHeight;
+    this.c.width = this.w * this.dpr;
+    this.c.height = this.h * this.dpr;
+    this.c.style.width = this.w + 'px';
+    this.c.style.height = this.h + 'px';
+    this.ctx.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
+  }
+
+  make() {
+    const depth = 0.2 + Math.random() * 0.8;
+    const a = Math.random() * Math.PI * 2;
+    const sp = 0.2 + Math.random() * 0.6;
+    return {
+      x: Math.random() * this.w, y: Math.random() * this.h,
+      vx: Math.cos(a) * sp * depth, vy: Math.sin(a) * sp * depth - 0.15,
+      size: (8 + Math.random() * 28) * depth, depth,
+      color: this.colors[Math.floor(Math.random() * this.colors.length)],
+      alpha: 0.05 + Math.random() * 0.25 * depth,
+      pulse: Math.random() * Math.PI * 2
+    };
+  }
+
+  loop() {
+    this.raf = 0;
+    if (document.hidden) return;
+
+    const ctx = this.ctx, m = 100;
+    ctx.clearRect(0, 0, this.w, this.h);
+
+    for (const p of this.ps) {
+      const dx = p.x - this.mouse.x, dy = p.y - this.mouse.y;
+      const d = Math.hypot(dx, dy);
+      if (d < 250) {
+        const f = (1 - d / 250) * 0.4, an = Math.atan2(dy, dx);
+        p.vx += Math.cos(an) * f; p.vy += Math.sin(an) * f;
+      }
+      p.vx *= 0.988; p.vy *= 0.988;
+      p.x += p.vx;   p.y += p.vy;
+      p.pulse += 0.016;
+
+      if (p.y < -m) p.y = this.h + m;
+      if (p.y > this.h + m) p.y = -m;
+      if (p.x < -m) p.x = this.w + m;
+      if (p.x > this.w + m) p.x = -m;
+
+      const [r, g, b] = p.color;
+      const a = p.alpha * (0.7 + 0.3 * Math.sin(p.pulse)) * (0.6 + 0.4 * (1 - p.depth));
+      const grad = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.size / 2);
+      grad.addColorStop(0, 'rgba(' + r + ',' + g + ',' + b + ',1)');
+      grad.addColorStop(0.4, 'rgba(' + r + ',' + g + ',' + b + ',0.6)');
+      grad.addColorStop(1, 'rgba(' + r + ',' + g + ',' + b + ',0)');
+      ctx.globalAlpha = a;
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.size / 2, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+    this.raf = requestAnimationFrame(() => this.loop());
+  }
+}
+
+/* floating triangles - desktop only */
+function startShapes() {
+  const box = document.getElementById('geometryContainer');
+  const cols = ['rgba(167,139,250,0.8)','rgba(103,232,249,0.8)','rgba(232,121,249,0.8)','rgba(129,140,248,0.8)'];
+  const shapes = [];
+
+  for (let i = 0; i < 6; i++) {
+    const size = 40 + Math.random() * 80;
+    const col = cols[Math.floor(Math.random() * cols.length)];
+    const el = document.createElement('div');
+    el.className = 'geometric-shape';
+    el.style.width = size + 'px';
+    el.style.height = size + 'px';
+    el.innerHTML = '<svg width="' + size + '" height="' + size + '" viewBox="0 0 100 100">' +
+      '<path d="M50,10 L90,90 L10,90 Z" fill="' + col + '" fill-opacity="0.35" stroke="' + col + '" stroke-width="2"/></svg>';
+    box.appendChild(el);
+    shapes.push({
+      el, x: Math.random() * window.innerWidth, y: Math.random() * window.innerHeight,
+      t: 0, dur: 8 + Math.random() * 6,
+      rx: Math.random() * 6, ry: Math.random() * 6, rz: Math.random() * 6,
+      sx: (Math.random() - 0.5) * 0.005, sy: (Math.random() - 0.5) * 0.005, sz: (Math.random() - 0.5) * 0.005
+    });
+  }
+
+  (function tick() {
+    if (!document.hidden) {
+      for (const s of shapes) {
+        s.t += 0.016; s.rx += s.sx; s.ry += s.sy; s.rz += s.sz;
+        const pr = (s.t % s.dur) / s.dur, w = Math.sin(pr * Math.PI * 2);
+        s.el.style.transform = 'translate(' + s.x + 'px,' + (s.y + w * 30) + 'px) rotateX(' + s.rx +
+          'rad) rotateY(' + s.ry + 'rad) rotateZ(' + s.rz + 'rad) scale(' + (0.8 + w * 0.2) + ')';
+        s.el.style.opacity = 0.4 + 0.3 * w;
+      }
+    }
+    requestAnimationFrame(tick);
+  })();
+}
+
+/* subtle tilt - only for devices with a real mouse */
+function startTilt() {
+  if (!window.matchMedia('(hover: hover)').matches) return;
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+  let tx = 0, ty = 0, cx = 0, cy = 0;
+  document.addEventListener('mousemove', e => {
+    const r = wrapper.getBoundingClientRect();
+    tx = (e.clientX - (r.left + r.width / 2)) / r.width * 8;
+    ty = (e.clientY - (r.top + r.height / 2)) / r.height * 5;
+  });
+  (function tick() {
+    cx += (tx - cx) * 0.1;
+    cy += (ty - cy) * 0.1;
+    wrapper.style.transform = 'perspective(1200px) rotateY(' + cx + 'deg) rotateX(' + (-cy) + 'deg)';
+    requestAnimationFrame(tick);
+  })();
+}
+</script>
 
 </body>
 </html>
